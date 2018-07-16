@@ -18,7 +18,7 @@ Parameters to modify are:
   ID:   The name of the project, gRNA or gene.  This will be used to create the output folder.
   ref_seq: This is the expected amplicon.  If using forward or merged reads, it will be the 'top' sequence.
   seq_start: A unique 12-20bp sequence in your ref_seq amplicon.  Must be **upstream** of the gRNA sequence
-  seq_end:  A unique 12-20bp sequence in your ref_seq amplicon.  Must be **downstrea** of the gRNA sequence.
+  seq_end:  A unique 12-20bp sequence in your ref_seq amplicon.  Must be **downstream** of the gRNA sequence.
   fastq_files: These are the fastq files to search.  If you want to run on all fastq files in a directory, leave alone.
   test_list: A series of names and sequences you wish to search for in fastq file.
 

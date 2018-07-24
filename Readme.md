@@ -34,6 +34,12 @@ In the folder are 2 files:  a CSV file:  Summary of all fastq files with test_se
 **Sample files**
 All data from paper is uploaded in sample_directory.  In each zip file are the fastq files and CRIS.py script used to analyze the NGS data.
 
+**Tips**
+    1.  Formatting is important.  Check that all entered text is surrounded by quotes 'like this'
+    2.  When analyzing data from the CSV file, first look at the SNP check and raw_wt_counter to verify you are getting all reads.
+    3.  You must close the .CSV file before running the script again.  CRIS.py can not edit a file that is already open in excel.
+
+
 **Citing**
 
 

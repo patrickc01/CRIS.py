@@ -20,7 +20,7 @@ Parameters to modify are:
   2.  ref_seq: This is the expected amplicon.  If using forward or merged reads, it will be the 'top' sequence.
   3.  seq_start: A unique 12-20bp sequence in your ref_seq amplicon.  Must be **upstream** of the gRNA sequence
   4.  seq_end:  A unique 12-20bp sequence in your ref_seq amplicon.  Must be **downstream** of the gRNA sequence.
-  5.  fastq_files: These are the fastq files to search.  If you want to run on all fastq files in a directory, leave as *.fastq
+  5.  fastq_files: These are the fastq files to search.  If you want to run on all fastq files in a directory, leave as "\*.fastq".  If running on only foward reads, use nomenclature of forward reads, ie \*R1_001.fastq
   6.  test_list: A series of names and sequences you wish to search for in fastq file.  Edit the name (ie g10) and the sequence for each desired test.  You can copy the line and add as many as you like.
 Save the program/ parameters.
 Run the program- Run -> Run File
@@ -29,7 +29,9 @@ Check the printed 'Working directory' and verify that is where your fastq files 
 
 **Output**
 A folder is created in the working directory with the name 'ID' from step 1.
-In the folder are 2 files:  a CSV file:  Summary of all fastq files with test_sequences and top indels.                                                             a TXT file:  Summary of all fastq files with sequence information of top reads from each fastq file.
+In the folder are two files:  
+1.  a CSV file:  Summary of all fastq files with test_sequences and top indels.
+2.  a TXT file:  Summary of all fastq files with sequence information of top reads from each fastq file.
 
 **Sample files**
 All data from paper is uploaded in sample_directory.  In each zip file are the fastq files and CRIS.py script used to analyze the NGS data.

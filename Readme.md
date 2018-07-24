@@ -22,10 +22,15 @@ Parameters to modify are:
   4.  seq_end:  A unique 12-20bp sequence in your ref_seq amplicon.  Must be **downstream** of the gRNA sequence.
   5.  fastq_files: These are the fastq files to search.  If you want to run on all fastq files in a directory, leave as "\*.fastq".  If running on only foward reads, use nomenclature of forward reads, ie \*R1_001.fastq
   6.  test_list: A series of names and sequences you wish to search for in fastq file.  Edit the name (ie g10) and the sequence for each desired test.  You can copy the line and add as many as you like.
+
 Save the program/ parameters.
-Run the program- Run -> Run File
-                 or click the Green triangle/play button
+
+Run the program. Run -> Run File
+                 or click the Green triangle/play button.
+                 
 Check the printed 'Working directory' and verify that is where your fastq files are located.
+
+Check results in newly created folder that has the same label as "ID".
 
 ## Output
 A folder is created in the working directory with the name 'ID' from step 1.

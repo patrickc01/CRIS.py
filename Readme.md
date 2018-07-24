@@ -1,9 +1,9 @@
 # CRIS.py
-   Analyze NGS data for CRISPR activity and screen for clones
+   Analyze NGS data for CRISPR activity and screen for clones.
 
 
-Getting Started
-CRIS.py is a an easy to use python script which analyzes NGS data for user-defined sequences.  Users directly modify the python script and run they script in the directory containing target fastq files.  After running, a folder is created in the same directory containing the analysis
+**Getting Started**
+CRIS.py is a an easy to use python script which analyzes NGS data for user-defined sequences.  Users directly modify the python script and run they script in the directory containing target fastq files.  After running CRIS.py, a folder is created in the current directory containing the analysis.
 
 **Installation and Requirements**
 CRIS.py requires **Python 2.7** and the **Pandas library**.  CRIS.py does not currently run with Python 3.
@@ -29,10 +29,10 @@ Check the printed 'Working directory' and verify that is where your fastq files 
 
 **Output**
 A folder is created in the working directory with the name 'ID' from step 1.
-In the folder are 2 files:  a CSV file:  Contains a summary of all wells with test_sequences, and top indels.                                                       a TXT file:  Contains sequence information of top reads from each fastq file.
+In the folder are 2 files:  a CSV file:  Summary of all fastq files with test_sequences and top indels.                                                             a TXT file:  Summary of all fastq files with sequence information of top reads from each fastq file.
 
 **Sample files**
-All data from paper is uploaded in sample_directory.  In each folder zip are the fastq files and CRIS.py script that was used to analyze the NGS data.  These scripts were tested and confirmed to run fine.
+All data from paper is uploaded in sample_directory.  In each zip file are the fastq files and CRIS.py script used to analyze the NGS data.
 
 **Citing**
 

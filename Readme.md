@@ -5,14 +5,15 @@
 **Getting Started**
 CRIS.py is a an easy to use python script which analyzes NGS data for user-defined sequences.  Users directly modify the python script and run they script in the directory containing target fastq files.  After running CRIS.py, a folder is created in the current directory containing the analysis.
 
-**Installation and Requirements**
+##Installation and Requirements
 CRIS.py requires **Python 2.7** and the **Pandas library**.  CRIS.py does not currently run with Python 3.
 An easy method to install Python 2.7 and Pandas is through:
     Enthough Canopy available at: https://store.enthought.com/downloads/
     or Anaconda at https://www.anaconda.com/download/
 
 
-**Usage**
+##Usage
+
 To use CRIS.py, directly modify the file CRIS.py in the Python editor.
 Change text between quote (') marks to reflect your target amplicon.  CRIS.py reads DNA as a simple text sequence.  Therefore all DNA sequences entered must be on the same strand (this means gRNAs that target the reverse strand will start with 'CC')
 Parameters to modify are:
@@ -27,23 +28,23 @@ Run the program- Run -> Run File
                  or click the Green triangle/play button
 Check the printed 'Working directory' and verify that is where your fastq files are located.
 
-**Output**
+##Output
 A folder is created in the working directory with the name 'ID' from step 1.
 In the folder are two files:  
 1.  a CSV file:  Summary of all fastq files with test_sequences and top indels.
 2.  a TXT file:  Summary of all fastq files with sequence information of top reads from each fastq file.
 
-**Sample files**
+##Sample files
 All data from paper is uploaded in sample_directory.  In each zip file are the fastq files and CRIS.py script used to analyze the NGS data.
 
-**Tips**
+##Tips
     1.  Formatting is important.  Check that all entered text is surrounded by quotes 'like this'
     2.  When analyzing data from the CSV file, first look at the SNP check and raw_wt_counter to verify you are getting all reads.
     3.  You must close the .CSV file before running the script again.  CRIS.py can not edit a file that is already open in excel.
 
 
-**Citing**
+##Citing
 
 
 
-**Acknowledgements**
+##Acknowledgements

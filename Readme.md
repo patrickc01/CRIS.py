@@ -35,7 +35,7 @@ In the folder are two files:
 2.  a TXT file:  Summary of all fastq files with sequence information of top reads from each fastq file.
 
 ## Sample files
-All data from paper is uploaded in sample_directory.  In each zip file are the fastq files and CRIS.py script used to analyze the NGS data.
+All data from paper are uploaded in [example_directory](https://github.com/patrickc01/CRIS.py/tree/master/example_data).  In each zip file are the fastq files and CRIS.py script used to analyze the NGS data.
 
 ## Tips
 1.  Formatting is important.  Check that all entered text is surrounded by quotes 'like this'

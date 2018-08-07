@@ -23,7 +23,7 @@ Parameters to modify are:
   5.  fastq_files: These are the fastq files to search.  If you want to run on all fastq files in a directory, leave as "\*.fastq".  If running on only foward reads, use nomenclature of forward reads, ie \*R1_001.fastq
   6.  test_list: A series of names and sequences you wish to search for in fastq file.  Edit the name (ie g10) and the sequence for each desired test.  You can copy the line and add as many as you like.
   
-![](/CRISpy_example.jpg)
+![](/CRISpy_example_1.jpg)
 
 Save the program/ parameters.
 

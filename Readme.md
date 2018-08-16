@@ -47,6 +47,7 @@ All data from paper are uploaded in [example_directory](https://github.com/patri
 1.  Formatting is important.  Check that all entered text is surrounded by quotes 'like this'
 2.  When analyzing data from the CSV file, first look at the SNP check and raw_wt_counter to verify you are getting all reads.
 3.  You must close the .CSV file before running the script again.  CRIS.py can not edit a file that is already open in excel.
+4.  To reduce sequencing error and background indels, you may move the seq_start and seq_end closer to the test_sequences.  Of note, reducing the size of the region can result in the mssing large deletions (be sure to look at SNP_check and raw_wt_counter, values should be ~1).
 
 
 ## Citing

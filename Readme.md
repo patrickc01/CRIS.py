@@ -48,6 +48,7 @@ All data from paper are uploaded in [example_directory](https://github.com/patri
 2.  When analyzing data from the CSV file, first look at the SNP check and raw_wt_counter to verify you are getting all reads.
 3.  You must close the .CSV file before running the script again.  CRIS.py can not edit a file that is already open in excel.
 4.  To reduce sequencing error and background indels, you may move the seq_start and seq_end closer to the test_sequences.  Of note, reducing the size of the region can result in the mssing large deletions (be sure to look at SNP_check and raw_wt_counter, values should be ~1).
+5.  If you are not getting any reads, double check CRIS.py is running in the correct directory.  Look at the "working directory" line and verify it is where your files are located.  If CRIS.py appears to be running in a different directory, right click the bottom window (where results show) and click "Change working directory", select the directory where your NGS reads are located.  (Canopy editor was most likely running in the folder where you originally saved CRIS.py script).
 
 
 ## Citing

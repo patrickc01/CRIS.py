@@ -6,7 +6,6 @@ import csv
 from collections import Counter
 from collections import OrderedDict
 import pandas as pd 
-from itertools import zip_longest as izip
 
 
 #CRIS.py
@@ -33,7 +32,7 @@ def pairwise(iterable):
     #Make an ordered dictionary from items in in test list
     "s -> (s0, s1), (s2, s3), (s4, s5), ..."
     a = iter(iterable)
-    return izip(a, a)
+    return zip(a, a)
 
 
 def make_project_directory(save_dir):

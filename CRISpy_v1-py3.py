@@ -6,7 +6,6 @@ import csv
 from collections import Counter
 from collections import OrderedDict
 import pandas as pd 
-# from itertools import izip
 from itertools import zip_longest as izip
 
 
@@ -217,7 +216,7 @@ def search_fastq(ID,ref_seq,seq_start,seq_end,fastq_files,test_list):
         csv_summary_df.to_csv(str(save_dir+ID)+'.csv')    #Filename to save csv as
     except (IOError):
         print('ERROR.  Script did not execute properly.')
-        print ('The requested .csv file {} is either open or you do not have access to it.  If open, please close file and rerun program').format(str(save_dir+ID)+'.csv')
+        print('The requested .csv file {} is either open or you do not have access to it.  If open, please close file and rerun program').format(str(save_dir+ID)+'.csv')
         
     master_Record = sorted(master_Record)
     print("Total wells with product:", fastq_counter)

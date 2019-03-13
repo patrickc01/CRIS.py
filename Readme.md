@@ -5,7 +5,7 @@
 CRIS.py is a an easy to use python script which analyzes NGS data for user-defined sequences.  Users directly modify the python script and run the script in the directory containing target fastq files.  After running CRIS.py, a folder is created in the current directory containing the analysis.
 
 ## Installation and Requirements
-CRIS.py requires **Python 2.7** and the **Pandas library**.  CRIS.py does not currently run with Python 3.
+CRIS.py requires **Python 2.7** and the **Pandas library**.  (see the -py3 file to run the script using Python 3)
 An easy method to install Python 2.7 and Pandas is through:
     Enthough Canopy available at: https://store.enthought.com/downloads/
     or Anaconda at https://www.anaconda.com/download/

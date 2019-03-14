@@ -1,3 +1,4 @@
+![](/crispy_logo_RL.jpg)
 # CRIS.py
    Analyze NGS data for CRISPR (or any engineered endonuclease) activity and screen for clones.
    Screen for NHEJ or multiple HDR events concurrently.
@@ -52,7 +53,9 @@ All data from paper are uploaded in [example_directory](https://github.com/patri
 
 
 ## Citing
-
+Connelly J., Pruett-Miller S. CRIS.py: A Versatile and High-throughput Analysis Program for CRISPR-based Genome Editing. Scientific Reports 9, 4194 (2019)
 
 
 ## Acknowledgements
+We thank Cherise Guess for scientific editing and Matthew Porteus for helpful comments on the manuscript.  We also thank the Genome Sequencing Facility of the Hartwell Center for Bioinformatics and Biotechnology at St. Jude Children’s Research Hospital.  
+

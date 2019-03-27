@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from __future__ import division
 import os
 import glob
@@ -26,9 +28,63 @@ def get_parameters():
                str('g6'),   str.upper('CCGAGGAGTCCGGCCCGGAAGAG'),
                 ]
 
+    # Command-line argument parsing, added by ariva@ufl.edu
+    cmdline_fastqs = []
+    args = sys.argv[1:]
+    if "-h" in args or "--help" in args:
+        usage()
+    prev = ""
+    for a in args:
+        if prev == "-id":
+            UD = a
+            prev = ""
+        elif prev == "-ref":
+            ref_seq = str.upper(a)
+            prev = ""
+        elif prev == "-start":
+            seq_start = str.upper(a)
+            prev = ""
+        elif prev == "-end":
+            seq_end = str.upper(a)
+            prev = ""
+        elif prev == "-test":
+            test_list = read_test_list(a)
+            prev = ""
+        elif a in ["-id", "-ref", "-start", "-end", "-test"]:
+            prev = a
+        else:
+            cmdline_fastqs.append(a)
+    if cmdline_fastqs:
+        fastq_files = cmdline_fastqs
+    # End additions
+    
     return ID,ref_seq,seq_start,seq_end,fastq_files,test_list
 
+# Added by ariva@ufl.edu
+def read_test_list(filename):
+    """Read the test_list from a tab-delimited file `filename'. The first
+column contains the test name, the second column contains the test sequence."""
+    tl = []
+    with open(filename, "r") as f:
+        c = csv.reader(f, delimiter='\t')
+        for line in c:
+            tl.append(c[0])
+            tl.append(str.upper(c[1]))
+    return tl
 
+def usage():
+    sys.stdout.write("""CRIS.py [options] fastqs...
+
+Where options are:
+  -id  I   | Set run ID to I
+  -ref R   | Set reference sequence to R
+  -start S | Set start sequence to S
+  -end E   | Set end sequence to E
+  -test T  | Read test list from tab-delimited file T
+
+""")
+    sys.exit(0)
+    
 def pairwise(iterable):
     #Make an ordered dictionary from items in in test list
     "s -> (s0, s1), (s2, s3), (s4, s5), ..."

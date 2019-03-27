@@ -36,7 +36,7 @@ def get_parameters():
     prev = ""
     for a in args:
         if prev == "-id":
-            UD = a
+            ID = a
             prev = ""
         elif prev == "-ref":
             ref_seq = str.upper(a)
@@ -68,8 +68,8 @@ column contains the test name, the second column contains the test sequence."""
     with open(filename, "r") as f:
         c = csv.reader(f, delimiter='\t')
         for line in c:
-            tl.append(c[0])
-            tl.append(str.upper(c[1]))
+            tl.append(line[0])
+            tl.append(str.upper(line[1]))
     return tl
 
 def usage():
@@ -189,7 +189,7 @@ def search_fastq(ID,ref_seq,seq_start,seq_end,fastq_files,test_list):
 
     print "Program Running"
 
-    for each_fastq_file in glob.glob(fastq_files):   #For each clone (really each fastq file in directory), open the file as "clone"
+    for each_fastq_file in fastq_files:   #For each clone (really each fastq file in directory), open the file as "clone"
         c_Counter = 0                     #Reset control counter to 0, this counter counts how many times both seq_start and seq_end are found in a line.
         start_counter = 0                  #How many times seq_start is found in a fastq file, used for SNP check
         end_counter = 0                    #How many times seq_end is found in a fastq file, used for SNP check

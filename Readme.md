@@ -35,6 +35,20 @@ Check the printed 'Working directory' and verify that is where your fastq files 
 
 Check results in newly created folder that has the same label as "ID".
 
+## Command-line usage
+
+Parameters can also be passed on the command-line; this avoids the need to edit the script itself, and allows the script to be included in automated analysis pipelines. In this case the syntax of the command is:
+
+```
+CRISpy_v1.py [options] fastqs...
+```
+
+The following table lists the available command-line options with the corresponding parameter name.
+
+Argument | Parameter | Description
+---------|-----------|------------
+-id      | ID        | Identifier for this analysis
+
 ## Output
 A folder is created in the working directory with the name 'ID' from step 1.
 In the folder are two files:  

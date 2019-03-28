@@ -44,10 +44,24 @@ CRISpy_v1.py [options] fastqs...
 ```
 
 The following table lists the available command-line options with the corresponding parameter name.
+Options have both a short and a long form (e.g., -i and --id) which can be used interchangeably.
 
-Argument | Parameter | Description
----------|-----------|------------
--id      | ID        | Identifier for this analysis
+Option | Long form | Parameter | Description
+-------|-----------|-----------|------------
+-i I   | --id I    | ID        | Set run ID to I
+-r R   | --ref R   | ref_seq   | Set reference sequence to R
+-s S   | --start S | seq_start | Set start sequence to S
+-e E   | --end E   | seq_end   | Set end sequence to E
+-t T   | --test T  | test_list | Read test list from tab-delimited file T
+
+The tab-delimited file specified with -t should have two columns, containing test name and test
+sequence respectively. For example:
+
+```
+g10	GAGGCAGGCGTCGAAGAGTACGG
+g14	CGGCCCTGAAGAAGACGGCGGGG
+g6	CCGAGGAGTCCGGCCCGGAAGAG
+```
 
 ## Output
 A folder is created in the working directory with the name 'ID' from step 1.

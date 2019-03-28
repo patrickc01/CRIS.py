@@ -35,22 +35,22 @@ def get_parameters():
         usage()
     prev = ""
     for a in args:
-        if prev == "-id":
+        if prev in ["-i", "--id"]:
             ID = a
             prev = ""
-        elif prev == "-ref":
+        elif prev == ["-r", "--ref"]:
             ref_seq = str.upper(a)
             prev = ""
-        elif prev == "-start":
+        elif prev == ["-s", "--start"]:
             seq_start = str.upper(a)
             prev = ""
-        elif prev == "-end":
+        elif prev == ["-e", "--end"]:
             seq_end = str.upper(a)
             prev = ""
-        elif prev == "-test":
+        elif prev == ["-t", "--test"]:
             test_list = read_test_list(a)
             prev = ""
-        elif a in ["-id", "-ref", "-start", "-end", "-test"]:
+        elif a in ["-i", "--id", "-r", "--ref", "-s", "--start", "-e", "--end", "-t", "--test"]:
             prev = a
         else:
             cmdline_fastqs.append(a)
@@ -75,12 +75,16 @@ column contains the test name, the second column contains the test sequence."""
 def usage():
     sys.stdout.write("""CRIS.py [options] fastqs...
 
-Where options are:
-  -id  I   | Set run ID to I
-  -ref R   | Set reference sequence to R
-  -start S | Set start sequence to S
-  -end E   | Set end sequence to E
-  -test T  | Read test list from tab-delimited file T
+Where options are (short form followed by long form):
+  -h   | --help    | Display this help message.
+  -i I | --id I    | Set run ID to I.
+  -r R | --ref R   | Set reference sequence to R.
+  -s S | --start S | Set start sequence to S.
+  -e E | --end E   | Set end sequence to E.
+  -t T | --test T  | Read test list from tab-delimited file T.
+
+The tab-delimited file passed as the value of `-t' should have two columns,
+containing the test name and test sequence respectively.
 
 """)
     sys.exit(0)

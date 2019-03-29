@@ -14,7 +14,7 @@ An easy method to install Python 2.7 and Pandas is through:
 
 ## Usage
 
-To use CRIS.py, directly modify the file CRIS.py in the Python editor.
+To use CRIS.py, directly modify the file CRIS.py in the Python editor (or use command-line options as described in the next section).
 Change text between quote (') marks to reflect your target amplicon.  CRIS.py reads DNA as a simple text sequence.  Therefore all DNA sequences entered must be on the same strand.
 Parameters to modify are:
   1.  ID:   The name of the project, gRNA or gene.  This will be used to create the output folder.

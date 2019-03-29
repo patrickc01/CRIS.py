@@ -14,7 +14,7 @@ An easy method to install Python 2.7 and Pandas is through:
 
 ## Usage
 
-To use CRIS.py, directly modify the file CRIS.py in the Python editor.
+To use CRIS.py, directly modify the file CRIS.py in the Python editor (or use command-line options as described in the next section).
 Change text between quote (') marks to reflect your target amplicon.  CRIS.py reads DNA as a simple text sequence.  Therefore all DNA sequences entered must be on the same strand.
 Parameters to modify are:
   1.  ID:   The name of the project, gRNA or gene.  This will be used to create the output folder.
@@ -34,6 +34,35 @@ Run the program. Run -> Run File
 Check the printed 'Working directory' and verify that is where your fastq files are located.
 
 Check results in newly created folder that has the same label as "ID".
+
+## Command-line usage
+
+Parameters can also be passed on the command-line; this avoids the need to edit the script itself, and allows the script to be included in automated analysis pipelines. In this case the syntax of the command is:
+
+```
+CRISpy_v1.py [options] fastqs...
+```
+
+The following table lists the available command-line options with the corresponding parameter name.
+Options have both a short and a long form (e.g., -i and --id) which can be used interchangeably.
+
+Option | Long form | Parameter | Description
+-------|-----------|-----------|------------
+-h     | --help    |           | Display help message
+-i I   | --id I    | ID        | Set run ID to I
+-r R   | --ref R   | ref_seq   | Set reference sequence to R
+-s S   | --start S | seq_start | Set start sequence to S
+-e E   | --end E   | seq_end   | Set end sequence to E
+-t T   | --test T  | test_list | Read test list from tab-delimited file T
+
+The tab-delimited file specified with -t should have two columns, containing test name and test
+sequence respectively. For example:
+
+```
+g10	GAGGCAGGCGTCGAAGAGTACGG
+g14	CGGCCCTGAAGAAGACGGCGGGG
+g6	CCGAGGAGTCCGGCCCGGAAGAG
+```
 
 ## Output
 A folder is created in the working directory with the name 'ID' from step 1.

@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 from __future__ import division
 import os
 import glob
@@ -26,9 +28,69 @@ def get_parameters():
                str('g6'),   str.upper('CCGAGGAGTCCGGCCCGGAAGAG'),
                 ]
 
+    # Command-line argument parsing, added by ariva@ufl.edu
+    cmdline_fastqs = []
+    args = sys.argv[1:]
+    if "-h" in args or "--help" in args:
+        usage()
+    prev = ""
+    for a in args:
+        if prev in ["-i", "--id"]:
+            ID = a
+            prev = ""
+        elif prev == ["-r", "--ref"]:
+            ref_seq = str.upper(a)
+            prev = ""
+        elif prev == ["-s", "--start"]:
+            seq_start = str.upper(a)
+            prev = ""
+        elif prev == ["-e", "--end"]:
+            seq_end = str.upper(a)
+            prev = ""
+        elif prev == ["-t", "--test"]:
+            test_list = read_test_list(a)
+            prev = ""
+        elif a in ["-i", "--id", "-r", "--ref", "-s", "--start", "-e", "--end", "-t", "--test"]:
+            prev = a
+        else:
+            cmdline_fastqs.append(a)
+    if cmdline_fastqs:
+        fastq_files = cmdline_fastqs
+    else:
+        fastq_files = glob.glob(fastq_files)
+    # End additions
+    
     return ID,ref_seq,seq_start,seq_end,fastq_files,test_list
 
+# Added by ariva@ufl.edu
+def read_test_list(filename):
+    """Read the test_list from a tab-delimited file `filename'. The first
+column contains the test name, the second column contains the test sequence."""
+    tl = []
+    with open(filename, "r") as f:
+        c = csv.reader(f, delimiter='\t')
+        for line in c:
+            tl.append(line[0])
+            tl.append(str.upper(line[1]))
+    return tl
 
+def usage():
+    sys.stdout.write("""CRIS.py [options] fastqs...
+
+Where options are (short form followed by long form):
+  -h   | --help    | Display this help message.
+  -i I | --id I    | Set run ID to I.
+  -r R | --ref R   | Set reference sequence to R.
+  -s S | --start S | Set start sequence to S.
+  -e E | --end E   | Set end sequence to E.
+  -t T | --test T  | Read test list from tab-delimited file T.
+
+The tab-delimited file passed as the value of `-t' should have two columns,
+containing the test name and test sequence respectively.
+
+""")
+    sys.exit(0)
+    
 def pairwise(iterable):
     #Make an ordered dictionary from items in in test list
     "s -> (s0, s1), (s2, s3), (s4, s5), ..."
@@ -133,7 +195,7 @@ def search_fastq(ID,ref_seq,seq_start,seq_end,fastq_files,test_list):
 
     print "Program Running"
 
-    for each_fastq_file in glob.glob(fastq_files):   #For each clone (really each fastq file in directory), open the file as "clone"
+    for each_fastq_file in fastq_files:   #For each clone (really each fastq file in directory), open the file as "clone"
         c_Counter = 0                     #Reset control counter to 0, this counter counts how many times both seq_start and seq_end are found in a line.
         start_counter = 0                  #How many times seq_start is found in a fastq file, used for SNP check
         end_counter = 0                    #How many times seq_end is found in a fastq file, used for SNP check

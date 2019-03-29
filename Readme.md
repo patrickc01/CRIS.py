@@ -48,6 +48,7 @@ Options have both a short and a long form (e.g., -i and --id) which can be used 
 
 Option | Long form | Parameter | Description
 -------|-----------|-----------|------------
+-h     | --help    |           | Display help message
 -i I   | --id I    | ID        | Set run ID to I
 -r R   | --ref R   | ref_seq   | Set reference sequence to R
 -s S   | --start S | seq_start | Set start sequence to S

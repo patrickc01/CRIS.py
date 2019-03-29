@@ -56,6 +56,8 @@ def get_parameters():
             cmdline_fastqs.append(a)
     if cmdline_fastqs:
         fastq_files = cmdline_fastqs
+    else:
+        fastq_files = glob.glob(fastq_files)
     # End additions
     
     return ID,ref_seq,seq_start,seq_end,fastq_files,test_list

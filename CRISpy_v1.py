@@ -38,16 +38,16 @@ def get_parameters():
         if prev in ["-i", "--id"]:
             ID = a
             prev = ""
-        elif prev == ["-r", "--ref"]:
+        elif prev in ["-r", "--ref"]:
             ref_seq = str.upper(a)
             prev = ""
-        elif prev == ["-s", "--start"]:
+        elif prev in ["-s", "--start"]:
             seq_start = str.upper(a)
             prev = ""
-        elif prev == ["-e", "--end"]:
+        elif prev in ["-e", "--end"]:
             seq_end = str.upper(a)
             prev = ""
-        elif prev == ["-t", "--test"]:
+        elif prev in ["-t", "--test"]:
             test_list = read_test_list(a)
             prev = ""
         elif a in ["-i", "--id", "-r", "--ref", "-s", "--start", "-e", "--end", "-t", "--test"]:
@@ -59,7 +59,9 @@ def get_parameters():
     else:
         fastq_files = glob.glob(fastq_files)
     # End additions
-    
+    print "Input files:"
+    for f in fastq_files:
+        print "  " + f
     return ID,ref_seq,seq_start,seq_end,fastq_files,test_list
 
 # Added by ariva@ufl.edu
@@ -205,31 +207,33 @@ def search_fastq(ID,ref_seq,seq_start,seq_end,fastq_files,test_list):
         indel_size_list = []                          #List of all the indel sizes found in each file
         fastq_name = str(each_fastq_file)                                #Well name that contains the clone being screened
         line_list =[]                                  #List of all the lines found in a fastq file.  These lines must contain both seq_start and seq_end.  Used to find most highly occuring sequences
-        current_fastq_file = open(str(each_fastq_file), "r")     
-        for line in current_fastq_file:   #For each line in the fastq file
-            if test_dict.items()[0][1] in line:           #Counts the number of times the first item in test_dict is found in ANY of the lines of the fastq file.  This is a check in case SNPs are in BOTH seq_start and seq_end
-                raw_wt_counter+=1
-            if line.find(seq_start)>0 and line.find(seq_end)>0:  
-                c_Counter += 1
-                start_counter +=1     #Count # of times seq_start is found
-                end_counter +=1       #Count # of times seq_end is found
-                read_start = line.find(seq_start)
-                read_end = line.find(seq_end)+len(seq_end)
-                indel_size = line.find(seq_end)+len(seq_end) - line.find(seq_start) - wt_distance
-                indel_size_list.append(indel_size)
-                line_list.append(line[read_start:(read_end)])
-                for item in test_dict:
-                    if test_dict[item] in line:
-                        dict_Counters[item] +=1
-                    else:
-                        pass
-            elif line.find(seq_start)>0 and line.find(seq_end)<0:        #If seq_start is found and seq_end is not found, for SNPT test
-                start_counter +=1
-            elif line.find(seq_end)>0 and line.find(seq_start)<0:        #If seq_end is found and seq_start is not found, for SNP test
-                end_counter+=1
-            else:
-                pass
-        current_fastq_file.close()               
+
+        with open(str(each_fastq_file), "r") as current_fastq_file:
+            for line in current_fastq_file:   #For each line in the fastq file
+                if test_dict.items()[0][1] in line:           #Counts the number of times the first item in test_dict is found in ANY of the lines of the fastq file.  This is a check in case SNPs are in BOTH seq_start and seq_end
+                    raw_wt_counter+=1
+                if line.find(seq_start)>0 and line.find(seq_end)>0:  
+                    c_Counter += 1
+                    start_counter +=1     #Count # of times seq_start is found
+                    end_counter +=1       #Count # of times seq_end is found
+                    read_start = line.find(seq_start)
+                    read_end = line.find(seq_end)+len(seq_end)
+                    indel_size = line.find(seq_end)+len(seq_end) - line.find(seq_start) - wt_distance
+                    indel_size_list.append(indel_size)
+                    line_list.append(line[read_start:(read_end)])
+                    for item in test_dict:
+                        if test_dict[item] in line:
+                            dict_Counters[item] +=1
+                        else:
+                            pass
+                elif line.find(seq_start)>0 and line.find(seq_end)<0:        #If seq_start is found and seq_end is not found, for SNPT test
+                    start_counter +=1
+                elif line.find(seq_end)>0 and line.find(seq_start)<0:        #If seq_end is found and seq_start is not found, for SNP test
+                    end_counter+=1
+                else:
+                    pass
+        # current_fastq_file.close()
+        
         try:
             SNP_test = format(start_counter / end_counter, '.2f')        #Compare counts of seq_start and seq_end for SNP test
         except ZeroDivisionError:
@@ -258,7 +262,7 @@ def search_fastq(ID,ref_seq,seq_start,seq_end,fastq_files,test_list):
              pass
 
 
-    print"SUMMARY"
+    print "SUMMARY"
     make_project_directory(ID)
     #print master_distance_and_count_summary
     pd_columns = ['Name','Sample','Total', 'Total_indel', '#1-Indel','#1-Reads(%)','#2-Indel','#2-Reads(%)','#3-Indel','#3-Reads(%)','#4-Indel','#4-Reads(%)','#5-Indel','#5-Reads(%)',
@@ -285,8 +289,6 @@ def search_fastq(ID,ref_seq,seq_start,seq_end,fastq_files,test_list):
     write_to_file(master_Record,f)
     f.close()
     
-
-
 def main():
     ID = ''
     ref_seq = ''
@@ -298,5 +300,6 @@ def main():
     ID, ref_seq, seq_start, seq_end, fastq_files, test_list = get_parameters()
     search_fastq(ID, ref_seq, seq_start, seq_end, fastq_files, test_list)
     print("Done")
+
 if __name__== "__main__":
     main()

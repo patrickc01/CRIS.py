@@ -9,7 +9,7 @@ import pandas as pd
 from itertools import izip
 
 
-#CRIS.py
+#CRIS.py Legacy Version
 
 #Modify parameters below in the get_parameters() section.
 

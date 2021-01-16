@@ -23,7 +23,16 @@ Parameters to modify are:
   4.  seq_end:  A unique 12-20bp sequence in your ref_seq amplicon.  Must be **3'** of the gRNA sequence.
   5.  fastq_files: These are the fastq files to search.  If you want to run on all fastq files in a directory, leave as "\*.fastq".  If running on only foward reads, use nomenclature of forward reads, ie \*R1_001.fastq
   6.  test_list: A series of names and sequences you wish to search for in fastq file.  Edit the name (ie g10) and the sequence for each desired test.  You can copy the line and add as many as you like.
-  
+
+### V2 and python3
+
+From the folder with the script, execute the program with the arguments described above. For example, to run the included tests for Figure 2, run the following program. 
+
+```sh
+python3 CRISpy_v2-py3.py --id Locus_1 --start GCGGAGAACTG --end GCCGAGGAGGA --test example_data/CRISpy_examples/Figure2/Fig2_joined_reads/tests.tab --ref agggaatgccccggagggcggagaactgggacgaggccgaggtaggcgcggaggaggcaggcgtcgaagagtacggccctgaagaagacggcggggaggagtcgggcgccgaggagtccggcccggaagagtccggcccggaggaactgggcgccgaggaggagatgg example_data/CRISpy_examples/Figure2/Fig2_joined_reads/*.fastq
+
+```
+
 ![](/CRISpy_example_1.jpg)
 
 Save the program/ parameters.

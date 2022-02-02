@@ -6,6 +6,7 @@ import csv
 from collections import Counter
 from collections import OrderedDict
 import pandas as pd 
+import copy
 
 
 #CRIS.py
@@ -14,7 +15,7 @@ import pandas as pd
 
 def get_parameters():
     #Note to user- Change text inside of quote marks ('YOUR DNA SEQUENCES GO HERE') for your experiment.  Case of text does not matter.
-    ID = 'Locus_1'
+    ID = 'Locus_1_w_align'
     ref_seq = str.upper('agggaatgccccggagggcggagaactgggacgaggccgaggtaggcgcggaggaggcaggcgtcgaagagtacggccctgaagaagacggcggggaggagtcgggcgccgaggagtccggcccggaagagtccggcccggaggaactgggcgccgaggaggagatgg')
     seq_start = str.upper('GCGGAGAACTG')
     seq_end = str.upper('GCCGAGGAGGA')
@@ -224,7 +225,7 @@ def search_fastq(ID,ref_seq,seq_start,seq_end,fastq_files,test_list):
 
     return master_Record
     
-def buildTable(seq1,seq2,match=1,mismatch=-1,gap_open=-3,gap_ext=-1):
+def buildTable(seq1,seq2,match=1,mismatch=-1,gap_open=-50,gap_ext=-0.5):
     """Build alignment table"""
     # Intialize table with 0 as values
     middle = []
@@ -233,44 +234,65 @@ def buildTable(seq1,seq2,match=1,mismatch=-1,gap_open=-3,gap_ext=-1):
 
 
     for row in range(len(seq1) +1):
-        row = []
+        rowM = []
+        rowU = []
+        rowL = []
         for col in range(len(seq2) + 1):
-            row.append(0)
-        middle.append(row)
-        upper = copy.deepcopy(middle)
-        lower = copy.deepcopy(middle)
+            if row == 0 and col == 0:
+                rowU.append(gap_open)
+                rowL.append(gap_open)
+                rowM.append(0)
+            elif row == 0 and col >0:
+                rowL.append(-float('Inf'))
+                rowU.append(gap_open + col * gap_ext)
+                rowM.append(gap_open + col * gap_ext)
+            elif row >0 and col == 0:
+                rowL.append(gap_open + row * gap_ext)
+                rowM.append(gap_open + row * gap_ext)
+                rowU.append(-float('Inf'))
+            else:
+                rowU.append(0)
+                rowL.append(0)
+                rowM.append(0)
 
+            
+
+            #row.append(0)
+        middle.append(rowM)
+        lower.append(rowL)
+        upper.append(rowU)
+
+            
+
+            #row.append(0)
+        #middle.append(row)
+        #upper = copy.deepcopy(middle)
+        #lower = copy.deepcopy(middle)
+    
     # Initialize all gap values for matricies
     ## 1st row
-    for col_id in range(1,len(middle[0])):
+    #for col_id in range(1,len(middle[0])):
     #middle[0][col_id] = -float('Inf')
-        lower[0][col_id] = -float('Inf')
+        #lower[0][col_id] = -float('Inf')
     ## 1st column
-    for row_id in range(1,len(middle)):
+    #for row_id in range(1,len(middle)):
     #middle[row_id][0] = -float('Inf')
-        upper[row_id][0] = -float('Inf')
-
-    print("middle")
-    print_table(middle)
-    print("lower")
-    print_table(lower)
-    print("upper")
-    print_table(upper)
+        #upper[row_id][0] = -float('Inf')
 
     # Initalize 0,0 values for matricies
-    middle[0][0] = 0
-    lower[0][0] = gap_open
-    upper[0][0] = gap_open
+    #middle[0][0] = 0
+    #lower[0][0] = gap_open
+    #upper[0][0] = gap_open
 
     # Initalize gap opening and gap extension penalties for lower and middle (gap in j)
-    for col_id in range(1,len(lower[0])):
-        upper[0][col_id] = gap_open + col_id * gap_ext
-        middle[0][col_id] =  upper[0][col_id]
+    #for col_id in range(1,len(lower[0])):
+        #upper[0][col_id] = gap_open + col_id * gap_ext
+        #middle[0][col_id] =  upper[0][col_id]
 
     # Initalize gap opening and gap extension penalties for upper (gap in i)
-    for row_id in range(1,len(upper)):
-        lower[row_id][0] = gap_open + row_id * gap_ext
-        middle[row_id][0] = lower[row_id][0]
+    #for row_id in range(1,len(upper)):
+        #lower[row_id][0] = gap_open + row_id * gap_ext
+        #middle[row_id][0] = lower[row_id][0]
 
     # Calculate scores
     for i in range(1,len(seq1)+1):
@@ -285,20 +307,13 @@ def buildTable(seq1,seq2,match=1,mismatch=-1,gap_open=-3,gap_ext=-1):
                 score = mismatch
 
             # Update matricies
-            lower[i][j] = max(lower[i-1][j] + gap_ext,middle[i-1][j] + gap_open -1)
-            upper[i][j] = max(upper[i][j-1] + gap_ext, middle[i][j-1] + gap_open -1)
+            lower[i][j] = max(lower[i-1][j] + gap_ext,middle[i-1][j] + gap_open +gap_ext)
+            upper[i][j] = max(upper[i][j-1] + gap_ext, middle[i][j-1] + gap_open +gap_ext)
             middle[i][j] = max(lower[i][j],upper[i][j],middle[i-1][j-1] + score)
 
-    print("middle")
-    print_table(middle)
-    print("lower")
-    print_table(lower)
-    print("upper")
-    print_table(upper)
 
     align1,align2,match_symbols = traceback(seq1,seq2,lower,middle,upper,match,mismatch,gap_open,gap_ext)
-    
-    #return align1,align2,match_symbols
+    return align1,align2,match_symbols
 
 def traceback(seq1,seq2,lower,middle,upper,match,mismatch,gap_open,gap_extend):
     align1 = ""
@@ -310,7 +325,31 @@ def traceback(seq1,seq2,lower,middle,upper,match,mismatch,gap_open,gap_extend):
 
     #Iterate through cells
     while i != 0 and j !=0:
-        if middle[i][j] == middle[i-1][j-1] + match or middle[i][j] == middle[i-1][j-1] + mismatch:
+
+        if middle[i][j] == lower[i][j]: # Extend Gap
+            #print("lower")
+            align1 = seq1[i-1] + align1
+            align2 = "-" + align2
+            match_symbols = " " + match_symbols
+            i-=1
+        elif middle[i][j] == middle[i-1][j] + gap_open + gap_extend: # Open gap/ Gap Start
+            align1 = seq1[i-1] + align1
+            align2 = "-" + align2
+            match_symbols = " " + match_symbols
+            i-=1
+        elif middle[i][j] == upper[i][j]: # Gap in seq1 (i)
+            align1 = "-" + align1
+            align2 = seq2[j-1] + align2
+            match_symbols = " " + match_symbols
+        
+            j-=1
+        elif middle[i][j] == upper[i][j-1]: # Gap in seq1 (i)
+            align1 = "-" + align1
+            align2 = seq2[j-1] + align2
+            match_symbols = " " + match_symbols
+        
+            j-=1
+        elif (seq1[i-1] == seq2[j-1] and middle[i][j] == middle[i-1][j-1] + match) or ( seq1[i-1] != seq2[j-1] and middle[i][j] == middle[i-1][j-1] + mismatch):
             align1 = seq1[i-1] + align1
             align2 = seq2[j-1] + align2
             
@@ -319,18 +358,6 @@ def traceback(seq1,seq2,lower,middle,upper,match,mismatch,gap_open,gap_extend):
             else:
                 match_symbols = "." + match_symbols
             i-=1
-            j-=1
-            
-        elif middle[i-1][j] == lower[i-1][j]: # Gap in sequence2 (j)
-            align1 = seq1[i-1] + align1
-            align2 = "-" + align2
-            match_symbols+= " "
-            i-=1
-        elif middle[i][j-1] == lower[i][j-1]: # Gap in seq1 (i)
-            align1 = "-" + align1
-            align2 = seq2[j-1] + align2
-            match_symbols = "-"
-        
             j-=1
             
         # Align the rest of the sequence to gaps if row or column is index 0 ('-')
@@ -345,9 +372,23 @@ def traceback(seq1,seq2,lower,middle,upper,match,mismatch,gap_open,gap_extend):
             align2 = seq2[j-1] + align2
             match_symbols = " " + match_symbols
             j-=1
-    
+        
+        #print(align1,match_symbols,align2)
     return align1,align2,match_symbols
 
+def print_table(t):
+  for c, row in enumerate(t):
+    #print("Row {}: {}".format(c,row))
+    for col in row:
+      #print("{}     ".format(col),end="")
+      print("{0:>5}".format(col),end="")
+    print("\n",end="")
+
+def write_alignments(alignL,outF="alignments.txt"):
+    with open(outF,"w") as OF:
+        for line in alignL:
+            outString = " ".join(line)
+            print(outString,file=OF)
 
 def main():
     ID = ''
@@ -361,17 +402,23 @@ def main():
     master_record = search_fastq(ID, ref_seq, seq_start, seq_end, fastq_files, test_list)
 
     # Align indels to ref seq provided
+    print('Aligning Indels')
     comparison_start = ref_seq.find(seq_start)
     comparison_end = ref_seq.find(seq_end) + len(seq_end)
     comp_seq = ref_seq[comparison_start:comparison_end+1]
-    print("comp_seq: ",comp_seq)
-    print("Master REcord\n")
+    
+    alignmentList = []
     for record in master_record:
-        #print(record)
+        header = record[0]
+        alignmentList.append([header])
         for j in range(1,len(record)):
             seq, read_count = record[j].split(",")
-            buildTable(comp_seq,seq,gap=-5)
+            align1,align2,match_symbols = buildTable(comp_seq,seq)
+            alignment = align1 + "\n" + match_symbols + "\n" + align2
+            alignmentList.append([alignment, read_count])
 
+    print(alignmentList)
+    write_alignments(alignmentList)
     print("Done")
 if __name__== "__main__":
     main()

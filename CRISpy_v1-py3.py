@@ -221,7 +221,132 @@ def search_fastq(ID,ref_seq,seq_start,seq_end,fastq_files,test_list):
     print("Total wells with product:", fastq_counter)
     write_to_file(master_Record,f)
     f.close()
+
+    return master_Record
     
+def buildTable(seq1,seq2,match=1,mismatch=-1,gap_open=-3,gap_ext=-1):
+    """Build alignment table"""
+    # Intialize table with 0 as values
+    middle = []
+    upper = []
+    lower = []
+
+
+    for row in range(len(seq1) +1):
+        row = []
+        for col in range(len(seq2) + 1):
+            row.append(0)
+        middle.append(row)
+        upper = copy.deepcopy(middle)
+        lower = copy.deepcopy(middle)
+
+    # Initialize all gap values for matricies
+    ## 1st row
+    for col_id in range(1,len(middle[0])):
+    #middle[0][col_id] = -float('Inf')
+        lower[0][col_id] = -float('Inf')
+    ## 1st column
+    for row_id in range(1,len(middle)):
+    #middle[row_id][0] = -float('Inf')
+        upper[row_id][0] = -float('Inf')
+
+    print("middle")
+    print_table(middle)
+    print("lower")
+    print_table(lower)
+    print("upper")
+    print_table(upper)
+
+    # Initalize 0,0 values for matricies
+    middle[0][0] = 0
+    lower[0][0] = gap_open
+    upper[0][0] = gap_open
+
+    # Initalize gap opening and gap extension penalties for lower and middle (gap in j)
+    for col_id in range(1,len(lower[0])):
+        upper[0][col_id] = gap_open + col_id * gap_ext
+        middle[0][col_id] =  upper[0][col_id]
+
+    # Initalize gap opening and gap extension penalties for upper (gap in i)
+    for row_id in range(1,len(upper)):
+        lower[row_id][0] = gap_open + row_id * gap_ext
+        middle[row_id][0] = lower[row_id][0]
+
+    # Calculate scores
+    for i in range(1,len(seq1)+1):
+        for j in range(1,len(seq2)+1):
+          # Calculate match/mismatch score for middle
+            score = 0
+            symbol_1 = seq1[i -1]
+            symbol_2 = seq2[j -1]
+            if symbol_1 == symbol_2:
+                score = match
+            else:
+                score = mismatch
+
+            # Update matricies
+            lower[i][j] = max(lower[i-1][j] + gap_ext,middle[i-1][j] + gap_open -1)
+            upper[i][j] = max(upper[i][j-1] + gap_ext, middle[i][j-1] + gap_open -1)
+            middle[i][j] = max(lower[i][j],upper[i][j],middle[i-1][j-1] + score)
+
+    print("middle")
+    print_table(middle)
+    print("lower")
+    print_table(lower)
+    print("upper")
+    print_table(upper)
+
+    align1,align2,match_symbols = traceback(seq1,seq2,lower,middle,upper,match,mismatch,gap_open,gap_ext)
+    
+    #return align1,align2,match_symbols
+
+def traceback(seq1,seq2,lower,middle,upper,match,mismatch,gap_open,gap_extend):
+    align1 = ""
+    align2 = ""
+    match_symbols = ""
+
+    i = len(middle) -1
+    j = len(middle[0]) -1
+
+    #Iterate through cells
+    while i != 0 and j !=0:
+        if middle[i][j] == middle[i-1][j-1] + match or middle[i][j] == middle[i-1][j-1] + mismatch:
+            align1 = seq1[i-1] + align1
+            align2 = seq2[j-1] + align2
+            
+            if seq1[i-1] == seq2[j-1]:
+                match_symbols = "|" + match_symbols
+            else:
+                match_symbols = "." + match_symbols
+            i-=1
+            j-=1
+            
+        elif middle[i-1][j] == lower[i-1][j]: # Gap in sequence2 (j)
+            align1 = seq1[i-1] + align1
+            align2 = "-" + align2
+            match_symbols+= " "
+            i-=1
+        elif middle[i][j-1] == lower[i][j-1]: # Gap in seq1 (i)
+            align1 = "-" + align1
+            align2 = seq2[j-1] + align2
+            match_symbols = "-"
+        
+            j-=1
+            
+        # Align the rest of the sequence to gaps if row or column is index 0 ('-')
+        while i != 0 and j == 0:
+            align2 = "-" + align2
+            align1 = seq1[i-1] + align1
+            match_symbols = " " + match_symbols
+            i-=1
+
+        while i ==0 and j != 0:
+            align1 = "-" + align1
+            align2 = seq2[j-1] + align2
+            match_symbols = " " + match_symbols
+            j-=1
+    
+    return align1,align2,match_symbols
 
 
 def main():
@@ -233,7 +358,20 @@ def main():
     test_list = []
     print("CRIS.py \nMain program")
     ID, ref_seq, seq_start, seq_end, fastq_files, test_list = get_parameters()
-    search_fastq(ID, ref_seq, seq_start, seq_end, fastq_files, test_list)
+    master_record = search_fastq(ID, ref_seq, seq_start, seq_end, fastq_files, test_list)
+
+    # Align indels to ref seq provided
+    comparison_start = ref_seq.find(seq_start)
+    comparison_end = ref_seq.find(seq_end) + len(seq_end)
+    comp_seq = ref_seq[comparison_start:comparison_end+1]
+    print("comp_seq: ",comp_seq)
+    print("Master REcord\n")
+    for record in master_record:
+        #print(record)
+        for j in range(1,len(record)):
+            seq, read_count = record[j].split(",")
+            buildTable(comp_seq,seq,gap=-5)
+
     print("Done")
 if __name__== "__main__":
     main()

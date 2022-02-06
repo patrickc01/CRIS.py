@@ -223,7 +223,7 @@ def search_fastq(ID,ref_seq,seq_start,seq_end,fastq_files,test_list):
     write_to_file(master_Record,f)
     f.close()
 
-    return master_Record
+    return master_Record, save_dir
     
 def buildTable(seq1,seq2,match=1,mismatch=-1,gap_open=-50,gap_ext=-0.5):
     """Build alignment table"""
@@ -349,8 +349,9 @@ def print_table(t):
       print("{0:>5}".format(col),end="")
     print("\n",end="")
 
-def write_alignments(alignL,outF="alignments.txt"):
-    with open(outF,"w") as OF:
+def write_alignments(alignL,ID,outDir,outF="alignments.txt"):
+    outPath = os.path.join(outDir,ID+outF)
+    with open(outPath,"w") as OF:
         for line in alignL:
             outString = " ".join(line)
             print(outString,file=OF)
@@ -364,7 +365,7 @@ def main():
     test_list = []
     print("CRIS.py \nMain program")
     ID, ref_seq, seq_start, seq_end, fastq_files, test_list = get_parameters()
-    master_record = search_fastq(ID, ref_seq, seq_start, seq_end, fastq_files, test_list)
+    master_record, save_dir = search_fastq(ID, ref_seq, seq_start, seq_end, fastq_files, test_list)
 
     # Align indels to ref seq provided
     print('Aligning Indels')
@@ -382,7 +383,7 @@ def main():
             alignment = align1 + "\n" + match_symbols + "\n" + align2
             alignmentList.append([alignment, read_count])
 
-    write_alignments(alignmentList)
+    write_alignments(alignmentList,ID,save_dir)
     print("Done")
 if __name__== "__main__":
     main()

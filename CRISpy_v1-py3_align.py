@@ -227,12 +227,11 @@ def search_fastq(ID,ref_seq,seq_start,seq_end,fastq_files,test_list):
     
 def buildTable(seq1,seq2,match=1,mismatch=-1,gap_open=-50,gap_ext=-0.5):
     """Build alignment table"""
-    # Intialize table with 0 as values
     middle = []
     upper = []
     lower = []
 
-
+    # Initalize matricies for align with affine gap penalty
     for row in range(len(seq1) +1):
         rowM = []
         rowU = []
@@ -257,42 +256,9 @@ def buildTable(seq1,seq2,match=1,mismatch=-1,gap_open=-50,gap_ext=-0.5):
 
             
 
-            #row.append(0)
         middle.append(rowM)
         lower.append(rowL)
         upper.append(rowU)
-
-            
-
-            #row.append(0)
-        #middle.append(row)
-        #upper = copy.deepcopy(middle)
-        #lower = copy.deepcopy(middle)
-    
-    # Initialize all gap values for matricies
-    ## 1st row
-    #for col_id in range(1,len(middle[0])):
-    #middle[0][col_id] = -float('Inf')
-        #lower[0][col_id] = -float('Inf')
-    ## 1st column
-    #for row_id in range(1,len(middle)):
-    #middle[row_id][0] = -float('Inf')
-        #upper[row_id][0] = -float('Inf')
-
-    # Initalize 0,0 values for matricies
-    #middle[0][0] = 0
-    #lower[0][0] = gap_open
-    #upper[0][0] = gap_open
-
-    # Initalize gap opening and gap extension penalties for lower and middle (gap in j)
-    #for col_id in range(1,len(lower[0])):
-        #upper[0][col_id] = gap_open + col_id * gap_ext
-        #middle[0][col_id] =  upper[0][col_id]
-
-    # Initalize gap opening and gap extension penalties for upper (gap in i)
-    #for row_id in range(1,len(upper)):
-        #lower[row_id][0] = gap_open + row_id * gap_ext
-        #middle[row_id][0] = lower[row_id][0]
 
     # Calculate scores
     for i in range(1,len(seq1)+1):
@@ -310,7 +276,6 @@ def buildTable(seq1,seq2,match=1,mismatch=-1,gap_open=-50,gap_ext=-0.5):
             lower[i][j] = max(lower[i-1][j] + gap_ext,middle[i-1][j] + gap_open +gap_ext)
             upper[i][j] = max(upper[i][j-1] + gap_ext, middle[i][j-1] + gap_open +gap_ext)
             middle[i][j] = max(lower[i][j],upper[i][j],middle[i-1][j-1] + score)
-
 
     align1,align2,match_symbols = traceback(seq1,seq2,lower,middle,upper,match,mismatch,gap_open,gap_ext)
     return align1,align2,match_symbols
@@ -417,7 +382,6 @@ def main():
             alignment = align1 + "\n" + match_symbols + "\n" + align2
             alignmentList.append([alignment, read_count])
 
-    print(alignmentList)
     write_alignments(alignmentList)
     print("Done")
 if __name__== "__main__":

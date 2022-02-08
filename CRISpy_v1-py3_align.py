@@ -128,9 +128,6 @@ def search_fastq(ID,ref_seq,seq_start,seq_end,fastq_files,test_list):
     if wt_distance < 0:
         f.write("\n\n WARNING: THIS IS NOT GOING TO GIVE YOU THE FULL DATA. YOUR EXPECTED WT DISTANCE IS LESS THAN 0, it is: {}\n  Check your seq_start and seq_end again\n".format(wt_distance))
 
-    else:
-        pass
-
     print("Program Running")
 
     for each_fastq_file in glob.glob(fastq_files):   #For each clone (really each fastq file in directory), open the file as "clone"
@@ -143,30 +140,36 @@ def search_fastq(ID,ref_seq,seq_start,seq_end,fastq_files,test_list):
         indel_size_list = []                          #List of all the indel sizes found in each file
         fastq_name = str(each_fastq_file)                                #Well name that contains the clone being screened
         line_list =[]                                  #List of all the lines found in a fastq file.  These lines must contain both seq_start and seq_end.  Used to find most highly occuring sequences
-        current_fastq_file = open(str(each_fastq_file), "r")     
+        current_fastq_file = open(str(each_fastq_file), "r")    
+
+        line_counter = 0
         for line in current_fastq_file:   #For each line in the fastq file
-            if list(test_dict.items())[0][1] in line:           #Counts the number of times the first item in test_dict is found in ANY of the lines of the fastq file.  This is a check in case SNPs are in BOTH seq_start and seq_end
+            line_counter+=1
+            if line_counter % 4 != 2: # Only parse the lines that contain the dna sequences
+                continue
+            first_item = list(test_dict.items())[0][1] #Counts the number of times the first item in test_dict is found in ANY of the lines of the fastq file.  This is a check in case SNPs are in BOTH seq_start and seq_end
+            if line.find(first_item) > 0:
                 raw_wt_counter+=1
-            if line.find(seq_start)>0 and line.find(seq_end)>0:  
+            read_start_ind = line.find(seq_start)
+            read_end_ind = line.find(seq_end)
+            if read_start_ind > 0 and read_end_ind > 0:
                 c_Counter += 1
                 start_counter +=1     #Count # of times seq_start is found
                 end_counter +=1       #Count # of times seq_end is found
-                read_start = line.find(seq_start)
-                read_end = line.find(seq_end)+len(seq_end)
-                indel_size = line.find(seq_end)+len(seq_end) - line.find(seq_start) - wt_distance
+                indel_size = read_end_ind+len(seq_end) - read_start_ind - wt_distance
                 indel_size_list.append(indel_size)
-                line_list.append(line[read_start:(read_end)])
+                line_list.append(line[read_start_ind:read_end_ind])
                 for item in test_dict:
                     if test_dict[item] in line:
                         dict_Counters[item] +=1
-                    else:
-                        pass
-            elif line.find(seq_start)>0 and line.find(seq_end)<0:        #If seq_start is found and seq_end is not found, for SNPT test
+            
+            #elif line.find(seq_start)>0 and line.find(seq_end)<0:        #If seq_start is found and seq_end is not found, for SNPT test
+            elif read_start_ind > 0 and read_end_ind < 0:    
                 start_counter +=1
-            elif line.find(seq_end)>0 and line.find(seq_start)<0:        #If seq_end is found and seq_start is not found, for SNP test
+            #elif line.find(seq_end)>0 and line.find(seq_start)<0:        #If seq_end is found and seq_start is not found, for SNP test
+            elif read_start_ind < 0 and read_end_ind > 0:
                 end_counter+=1
-            else:
-                pass
+        
         current_fastq_file.close()               
         try:
             SNP_test = format(start_counter / end_counter, '.2f')        #Compare counts of seq_start and seq_end for SNP test
@@ -177,9 +180,8 @@ def search_fastq(ID,ref_seq,seq_start,seq_end,fastq_files,test_list):
         except ZeroDivisionError:
             pass
        
-        if c_Counter == 0 :
-            pass
-        elif c_Counter > 10 :  #if more than 10 control read counts, record data
+
+        if c_Counter > 10 :  #if more than 10 control read counts, record data
             print("{}: Total_reads:{}, {}".format(fastq_name,str(c_Counter).ljust(2), dict_Counters.items()))
             fastq_counter += 1
             test_list_string=str(" Testing: ")
@@ -189,11 +191,10 @@ def search_fastq(ID,ref_seq,seq_start,seq_end,fastq_files,test_list):
             #summary_line is a list, format:  Miller-Plate13-C01 TOTAL:2072 OrderedDict([('g3', 2010), ('Block_Only', 0), ('Mod_Only', 2), ('Block_Mod', 0), ('Full', 0)])       [(0, 2070), (-1, 2)]
             summary_line = ([str(fastq_name) + " TOTAL:" + str(c_Counter)+" "+test_list_string+"     "+"Top_reads:"+ str(Counter(indel_size_list).most_common(12))])
             for k,v in temp:          #Append the top found DNA sequences to summary_line
+                #print("k: ",k," v: ", v)
                 summary_line.append('{} , {}'.format(k,v))
             master_Record.append(summary_line)
             master_distance_and_count_summary.append(make_counter(indel_size_list,str(fastq_name), dict_Counters, c_Counter,SNP_test,raw_wt_counter))
-        else:
-             pass
 
 
     print("SUMMARY")
@@ -276,7 +277,7 @@ def buildTable(seq1,seq2,match=1,mismatch=-1,gap_open=-50,gap_ext=-0.5):
             lower[i][j] = max(lower[i-1][j] + gap_ext,middle[i-1][j] + gap_open +gap_ext)
             upper[i][j] = max(upper[i][j-1] + gap_ext, middle[i][j-1] + gap_open +gap_ext)
             middle[i][j] = max(lower[i][j],upper[i][j],middle[i-1][j-1] + score)
-
+    
     align1,align2,match_symbols = traceback(seq1,seq2,lower,middle,upper,match,mismatch,gap_open,gap_ext)
     return align1,align2,match_symbols
 
@@ -292,7 +293,6 @@ def traceback(seq1,seq2,lower,middle,upper,match,mismatch,gap_open,gap_extend):
     while i != 0 and j !=0:
 
         if middle[i][j] == lower[i][j]: # Extend Gap
-            #print("lower")
             align1 = seq1[i-1] + align1
             align2 = "-" + align2
             match_symbols = " " + match_symbols
@@ -337,15 +337,12 @@ def traceback(seq1,seq2,lower,middle,upper,match,mismatch,gap_open,gap_extend):
             align2 = seq2[j-1] + align2
             match_symbols = " " + match_symbols
             j-=1
-        
-        #print(align1,match_symbols,align2)
+    
     return align1,align2,match_symbols
 
 def print_table(t):
   for c, row in enumerate(t):
-    #print("Row {}: {}".format(c,row))
     for col in row:
-      #print("{}     ".format(col),end="")
       print("{0:>5}".format(col),end="")
     print("\n",end="")
 
@@ -370,8 +367,8 @@ def main():
     # Align indels to ref seq provided
     print('Aligning Indels')
     comparison_start = ref_seq.find(seq_start)
-    comparison_end = ref_seq.find(seq_end) + len(seq_end)
-    comp_seq = ref_seq[comparison_start:comparison_end+1]
+    comparison_end = ref_seq.find(seq_end)
+    comp_seq = ref_seq[comparison_start:comparison_end]
     
     alignmentList = []
     for record in master_record:
@@ -379,6 +376,7 @@ def main():
         alignmentList.append([header])
         for j in range(1,len(record)):
             seq, read_count = record[j].split(",")
+            seq = seq.strip() # Split extra whitepace from indel
             align1,align2,match_symbols = buildTable(comp_seq,seq)
             alignment = align1 + "\n" + match_symbols + "\n" + align2
             alignmentList.append([alignment, read_count])

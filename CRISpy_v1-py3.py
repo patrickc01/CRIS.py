@@ -127,9 +127,6 @@ def search_fastq(ID,ref_seq,seq_start,seq_end,fastq_files,test_list):
     if wt_distance < 0:
         f.write("\n\n WARNING: THIS IS NOT GOING TO GIVE YOU THE FULL DATA. YOUR EXPECTED WT DISTANCE IS LESS THAN 0, it is: {}\n  Check your seq_start and seq_end again\n".format(wt_distance))
 
-    else:
-        pass
-
     print("Program Running")
 
     for each_fastq_file in glob.glob(fastq_files):   #For each clone (really each fastq file in directory), open the file as "clone"
@@ -144,28 +141,34 @@ def search_fastq(ID,ref_seq,seq_start,seq_end,fastq_files,test_list):
         line_list =[]                                  #List of all the lines found in a fastq file.  These lines must contain both seq_start and seq_end.  Used to find most highly occuring sequences
         current_fastq_file = open(str(each_fastq_file), "r")     
         for line in current_fastq_file:   #For each line in the fastq file
-            if list(test_dict.items())[0][1] in line:           #Counts the number of times the first item in test_dict is found in ANY of the lines of the fastq file.  This is a check in case SNPs are in BOTH seq_start and seq_end
+            #if list(test_dict.items())[0][1] in line:           #Counts the number of times the first item in test_dict is found in ANY of the lines of the fastq file.  This is a check in case SNPs are in BOTH seq_start and seq_end
+            first_item = list(test_dict.items())[0][1]
+            if line.find(first_item) > 0:
                 raw_wt_counter+=1
-            if line.find(seq_start)>0 and line.find(seq_end)>0:  
+            read_start_ind = line.find(seq_start)
+            read_end_ind = line.find(seq_end)
+            #if line.find(seq_start)>0 and line.find(seq_end)>0:  
+            if read_start_ind > 0 and read_end_ind > 0:
                 c_Counter += 1
                 start_counter +=1     #Count # of times seq_start is found
                 end_counter +=1       #Count # of times seq_end is found
-                read_start = line.find(seq_start)
-                read_end = line.find(seq_end)+len(seq_end)
-                indel_size = line.find(seq_end)+len(seq_end) - line.find(seq_start) - wt_distance
+                #read_start = line.find(seq_start)
+                #read_end = line.find(seq_end)+len(seq_end)
+                #indel_size = line.find(seq_end)+len(seq_end) - line.find(seq_start) - wt_distance
+                indel_size = read_end_ind+len(seq_end) - read_start - wt_distance
                 indel_size_list.append(indel_size)
-                line_list.append(line[read_start:(read_end)])
+                line_list.append(line[read_start_ind:(read_end_ind)])
                 for item in test_dict:
                     if test_dict[item] in line:
                         dict_Counters[item] +=1
-                    else:
-                        pass
-            elif line.find(seq_start)>0 and line.find(seq_end)<0:        #If seq_start is found and seq_end is not found, for SNPT test
+            
+            #elif line.find(seq_start)>0 and line.find(seq_end)<0:        #If seq_start is found and seq_end is not found, for SNPT test
+            elif read_start_ind > 0 and read_end_ind < 0:    
                 start_counter +=1
-            elif line.find(seq_end)>0 and line.find(seq_start)<0:        #If seq_end is found and seq_start is not found, for SNP test
+            #elif line.find(seq_end)>0 and line.find(seq_start)<0:        #If seq_end is found and seq_start is not found, for SNP test
+            elif read_start_ind < 0 and read_end_ind > 0:
                 end_counter+=1
-            else:
-                pass
+        
         current_fastq_file.close()               
         try:
             SNP_test = format(start_counter / end_counter, '.2f')        #Compare counts of seq_start and seq_end for SNP test
@@ -191,8 +194,6 @@ def search_fastq(ID,ref_seq,seq_start,seq_end,fastq_files,test_list):
                 summary_line.append('{} , {}'.format(k,v))
             master_Record.append(summary_line)
             master_distance_and_count_summary.append(make_counter(indel_size_list,str(fastq_name), dict_Counters, c_Counter,SNP_test,raw_wt_counter))
-        else:
-             pass
 
 
     print("SUMMARY")

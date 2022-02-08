@@ -155,7 +155,7 @@ def search_fastq(ID,ref_seq,seq_start,seq_end,fastq_files,test_list):
                 #read_start = line.find(seq_start)
                 #read_end = line.find(seq_end)+len(seq_end)
                 #indel_size = line.find(seq_end)+len(seq_end) - line.find(seq_start) - wt_distance
-                indel_size = read_end_ind+len(seq_end) - read_start - wt_distance
+                indel_size = read_end_ind+len(seq_end) - read_start_ind - wt_distance
                 indel_size_list.append(indel_size)
                 line_list.append(line[read_start_ind:(read_end_ind)])
                 for item in test_dict:

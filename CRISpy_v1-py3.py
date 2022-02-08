@@ -139,22 +139,21 @@ def search_fastq(ID,ref_seq,seq_start,seq_end,fastq_files,test_list):
         indel_size_list = []                          #List of all the indel sizes found in each file
         fastq_name = str(each_fastq_file)                                #Well name that contains the clone being screened
         line_list =[]                                  #List of all the lines found in a fastq file.  These lines must contain both seq_start and seq_end.  Used to find most highly occuring sequences
-        current_fastq_file = open(str(each_fastq_file), "r")     
+        current_fastq_file = open(str(each_fastq_file), "r")    
+
+        line_counter = 1
         for line in current_fastq_file:   #For each line in the fastq file
-            #if list(test_dict.items())[0][1] in line:           #Counts the number of times the first item in test_dict is found in ANY of the lines of the fastq file.  This is a check in case SNPs are in BOTH seq_start and seq_end
-            first_item = list(test_dict.items())[0][1]
+            if line_counter % 4 != 2: # Only parse the lines that contain the dna sequences
+                continue
+            first_item = list(test_dict.items())[0][1] # Counts the number of times the first item in test_dict is found in ANY of the lines of the fastq file.  This is a check in case SNPs are in BOTH seq_start and seq_end
             if line.find(first_item) > 0:
                 raw_wt_counter+=1
             read_start_ind = line.find(seq_start)
             read_end_ind = line.find(seq_end)
-            #if line.find(seq_start)>0 and line.find(seq_end)>0:  
             if read_start_ind > 0 and read_end_ind > 0:
                 c_Counter += 1
                 start_counter +=1     #Count # of times seq_start is found
                 end_counter +=1       #Count # of times seq_end is found
-                #read_start = line.find(seq_start)
-                #read_end = line.find(seq_end)+len(seq_end)
-                #indel_size = line.find(seq_end)+len(seq_end) - line.find(seq_start) - wt_distance
                 indel_size = read_end_ind+len(seq_end) - read_start_ind - wt_distance
                 indel_size_list.append(indel_size)
                 line_list.append(line[read_start_ind:(read_end_ind)])
@@ -162,11 +161,9 @@ def search_fastq(ID,ref_seq,seq_start,seq_end,fastq_files,test_list):
                     if test_dict[item] in line:
                         dict_Counters[item] +=1
             
-            #elif line.find(seq_start)>0 and line.find(seq_end)<0:        #If seq_start is found and seq_end is not found, for SNPT test
-            elif read_start_ind > 0 and read_end_ind < 0:    
+            elif read_start_ind > 0 and read_end_ind < 0:   #If seq_start is found and seq_end is not found, for SNPT test 
                 start_counter +=1
-            #elif line.find(seq_end)>0 and line.find(seq_start)<0:        #If seq_end is found and seq_start is not found, for SNP test
-            elif read_start_ind < 0 and read_end_ind > 0:
+            elif read_start_ind < 0 and read_end_ind > 0:  #If seq_end is found and seq_start is not found, for SNP test
                 end_counter+=1
         
         current_fastq_file.close()               

@@ -15,14 +15,13 @@ import pandas as pd
 def get_parameters():
     #Note to user- Change text inside of quote marks ('YOUR DNA SEQUENCES GO HERE') for your experiment.  Case of text does not matter.
     ID = 'Locus_1'
-    ref_seq = str.upper('agggaatgccccggagggcggagaactgggacgaggccgaggtaggcgcggaggaggcaggcgtcgaagagtacggccctgaagaagacggcggggaggagtcgggcgccgaggagtccggcccggaagagtccggcccggaggaactgggcgccgaggaggagatgg')
-    seq_start = str.upper('GCGGAGAACTG')
-    seq_end = str.upper('GCCGAGGAGGA')
+    ref_seq = str.upper('TGGTGACCTCTCCACTTGCGGCTGTTTGTCCACTGCCTGGCAGGGGTGGGACCTGGCTGCACGGATGAGACGCTGCTGTCGGCCATCGCCAGCGCCCTGCACACTAGCACCATGCCCATCACGGGACAGCTCTCGGCCGCCGTGGAGAAGAACCCCGGCGTATGGCTCAACACCACGCAGCCCCTGTGCAAAGCCTTCATGGTGACCGACGAGGACATCAGGTAGCCCCTTGGCCTGGTCCCCTGCTGCTCCACCCTGTCTCTTGTGGCCGTGGGGACCCTGAGTGTCCCCGTGTGCCTGCGTGCTTCCCGTCTCCCCACGATGCTGCTGGGGTTTTGAAACAGAAACAGCCAGGGCAAGGGGACCCATCGTCGGAGCAGT')
+    seq_start = str.upper('GTGGGACCTGGCT')
+    seq_end = str.upper('GCTGCTGGGGTTT')
     fastq_files = '*.fastq'
     test_list = [
-               str('g10'),   str.upper('GAGGCAGGCGTCGAAGAGTACGG'), 
-               str('g14'),   str.upper('CGGCCCTGAAGAAGACGGCGGGG'),
-               str('g6'),   str.upper('CCGAGGAGTCCGGCCCGGAAGAG'),
+            str('g1'),   str.upper('CCGGCGTATGGCTCAACACCACG'), 
+
                 ]
 
     return ID,ref_seq,seq_start,seq_end,fastq_files,test_list
@@ -57,6 +56,25 @@ def write_to_file(record_entry,f):
         else:
             pass        
 
+def quantify_indel_types(temp_dict, indel_size_list, c_Counter):
+    #Quantify percentages of 0bp, in-frame, out-of-frame indels
+    counter_dict=Counter(indel_size_list)
+    ind_sample_dic={}
+    ind_sample_dic['outframe']=float(0)
+    ind_sample_dic['inframe']=float(0)
+    ind_sample_dic['0bp']=float(0)
+    for k,v in counter_dict.items():
+        if k==0:
+            ind_sample_dic['0bp'] = float(v / c_Counter)*100
+        elif abs(k) % 3 == 0:
+            ind_sample_dic['inframe'] = ind_sample_dic['inframe'] + float(v/c_Counter)*100
+        else:
+            ind_sample_dic['outframe'] = ind_sample_dic['outframe']+float(v/ c_Counter)*100
+    temp_dict["0bp"]=str(format(ind_sample_dic['0bp'], ".1f"))
+    temp_dict["In-frame"]=str(format(ind_sample_dic['inframe'], ".1f"))
+    temp_dict["Out-of-frame"]=str(format(ind_sample_dic['outframe'], ".1f"))
+    return temp_dict
+
 def make_counter(indel_size_list, current_fastq_file, dict_Counters, c_Counter, SNP_test, raw_wt_counter):
     top_common = 12             #Number of top found reads to write to results_counter .txt file
     temp_counter = Counter(indel_size_list).most_common(top_common)    #Count top indels present in fastq file
@@ -78,14 +96,14 @@ def make_counter(indel_size_list, current_fastq_file, dict_Counters, c_Counter, 
             temp_dict['Total'] = c_Counter
             temp_dict['SNP_test'] = SNP_test
             temp_dict['raw_wt_counter'] = raw_wt_counter
-            temp_dict['Total_indel'] = str((format(((c_Counter - indel_size_list.count(0))/c_Counter)*100,'.1f')))
+            temp_dict['Total_indel'] = str((format(((c_Counter - indel_size_list.count(0))/c_Counter)*100,'.1f'))+"%")
+            temp_dict=quantify_indel_types(temp_dict, indel_size_list, c_Counter)
         except ZeroDivisionError:
             pass
         
     for k,g in temp_counter:        #Fill in top indels sizes and amount
         temp_dict['#'+ str(counter)+ '-Indel']=k
         try:
-          # temp_dict['z%Indel'+str(counter)]= format(g/c_Counter *100, '.1f')
            temp_dict['#'+ str(counter)+'-Reads(%)'] = str(g) + ' ('+ str(format(g/c_Counter*100, '.1f')) + '%)'
         except TypeError:
             pass
@@ -199,7 +217,7 @@ def search_fastq(ID,ref_seq,seq_start,seq_end,fastq_files,test_list):
     make_project_directory(ID)
     #print master_distance_and_count_summary
     pd_columns = ['Name','Sample','Total', 'Total_indel', '#1-Indel','#1-Reads(%)','#2-Indel','#2-Reads(%)','#3-Indel','#3-Reads(%)','#4-Indel','#4-Reads(%)','#5-Indel','#5-Reads(%)',
-             '#6-Indel','#6-Reads(%)','#7-Indel','#7-Reads(%)','#8-Indel','#8-Reads(%)', 'SNP_test', 'raw_wt_counter']
+             '#6-Indel','#6-Reads(%)','#7-Indel','#7-Reads(%)','#8-Indel','#8-Reads(%)', 'SNP_test', 'raw_wt_counter', "0bp","In-frame","Out-of-frame"]
 
     flip_dict = list(test_dict.items())   #Need to flip order of items in dictionary.  That way when they are inserted into the excel list, the order will come out correct
     flip_dict.reverse()
